@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Responsive Dark Calculator</title>
+  <style>
+    body {
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: #2c2833;
+      font-family: Arial, sans-serif;
+    }
+
+    .calculator {
+      width: 90vw;
+      max-width: 400px;
+      background: #1e1b22;
+      border-radius: 5vw;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+      overflow: hidden;
+    }
+
+    .display {
+      background: #2c2833;
+      color: #fff;
+      font-size: 7vw;
+      text-align: right;
+      padding: 5vw;
+      min-height: 15vw;
+      box-sizing: border-box;
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+
+    /* Slide animation */
+    .slide-in {
+      animation: slideIn 0.2s ease;
+    }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(20px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+
+    /* Error shake */
+    .shake {
+      animation: shake 0.3s ease;
+    }
+    @keyframes shake {
+      0% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      50% { transform: translateX(5px); }
+      75% { transform: translateX(-5px); }
+      100% { transform: translateX(0); }
+    }
+
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 3vw;
+      padding: 4vw;
+    }
+
+    button {
+      aspect-ratio: 1/1;
+      border: none;
+      border-radius: 50%;
+      font-size: 5vw;
+      cursor: pointer;
+      background: #2e2a33;
+      color: #d1cfe2;
+      transition: transform 0.1s ease, box-shadow 0.2s ease, background 0.2s ease;
+    }
+
+    button:active {
+      transform: scale(0.9);
+      box-shadow: 0 0 15px rgba(150, 100, 255, 0.7);
+      background: #3a3442;
+    }
+
+    .btn-ac {
+      background: #86444c;
+      color: #fff;
+    }
+    .btn-ac:active {
+      box-shadow: 0 0 15px rgba(255, 80, 80, 0.7);
+      background: #a64c55;
+    }
+
+    .btn-equal {
+      background: #6a00ff;
+      color: #fff;
+    }
+    .btn-equal:active {
+      box-shadow: 0 0 20px rgba(150, 0, 255, 0.8);
+      background: #7a1aff;
+    }
+
+    .btn-operator {
+      background: #4a4455;
+      color: #fff;
+    }
+    .btn-operator:active {
+      box-shadow: 0 0 15px rgba(200, 200, 200, 0.7);
+      background: #5a5166;
+    }
+  </style>
+</head>
+<body>
+  <div class="calculator">
+    <div class="display" id="display"></div>
+    <div class="buttons">
+      <button class="btn-operator" onclick="insert('√(')">√</button>
+      <button class="btn-operator" onclick="insert('Math.PI')">π</button>
+      <button class="btn-operator" onclick="insert('')">^</button>
+      <button class="btn-operator" onclick="factorial()">!</button>
+
+      <button class="btn-ac" onclick="clearDisplay()">AC</button>
+      <button class="btn-operator" onclick="insert('(')">(</button>
+      <button class="btn-operator" onclick="insert(')')">)</button>
+      <button class="btn-operator" onclick="insert('%')">%</button>
+
+      <button onclick="insert('7')">7</button>
+      <button onclick="insert('8')">8</button>
+      <button onclick="insert('9')">9</button>
+      <button class="btn-operator" onclick="insert('/')">÷</button>
+
+      <button onclick="insert('4')">4</button>
+      <button onclick="insert('5')">5</button>
+      <button onclick="insert('6')">6</button>
+      <button class="btn-operator" onclick="insert('*')">×</button>
+
+      <button onclick="insert('1')">1</button>
+      <button onclick="insert('2')">2</button>
+      <button onclick="insert('3')">3</button>
+      <button class="btn-operator" onclick="insert('-')">-</button>
+
+      <button onclick="insert('0')">0</button>
+      <button onclick="insert('.')">.</button>
+      <button onclick="backspace()">⌫</button>
+      <button class="btn-operator" onclick="insert('+')">+</button>
+
+      <button class="btn-equal" onclick="calculate()">=</button>
+    </div>
+  </div>
+
+  <script>
+    const display = document.getElementById("display");
+
+    function animateDisplay(className) {
+      display.classList.remove(className);
+      void display.offsetWidth; // restart animation
+      display.classList.add(className);
+    }
+
+    function insert(value) {
+      display.textContent += value;
+      animateDisplay("slide-in");
+    }
+
+    function clearDisplay() {
+      display.textContent = "";
+    }
+
+    function backspace() {
+      display.textContent = display.textContent.slice(0, -1);
+    }
+
+    function factorial() {
+      let expr = display.textContent;
+      try {
+        let num = eval(expr);
+        if (num < 0) {
+          display.textContent = "Error";
+          animateDisplay("shake");
+          return;
+        }
+        let fact = 1;
+        for (let i = 1; i <= num; i++) {
+          fact *= i;
+        }
+        display.textContent = fact;
+        animateDisplay("slide-in");
+      } catch {
+        display.textContent = "Error";
+        animateDisplay("shake");
+      }
+    }
+
+    function calculate() {
+      try {
+        let expr = display.textContent
+          .replace(/√/g, "Math.sqrt")
+          .replace(/%/g, "/100");
+        display.textContent = eval(expr);
+        animateDisplay("slide-in");
+      } catch {
+        display.textContent = "Error";
+        animateDisplay("shake");
+      }
+    }
+  </script>
+</body>
+</html>
